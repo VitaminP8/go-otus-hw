@@ -1,4 +1,4 @@
-module github.com/VitaminP8/hw01_hello_otus
+module github.com/VitaminP8/go-otus-hw/hw01_hello_otus
 
 go 1.22
 
