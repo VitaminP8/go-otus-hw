@@ -28,10 +28,8 @@ func Unpack(s string) (string, error) {
 
 			count := int(r - '0')
 			res.WriteString(strings.Repeat(string(prev), count))
-		} else {
-			if i != 0 && !unicode.IsDigit(prev) {
-				res.WriteRune(prev)
-			}
+		} else if i != 0 && !unicode.IsDigit(prev) {
+			res.WriteRune(prev)
 		}
 		prev = r
 	}
