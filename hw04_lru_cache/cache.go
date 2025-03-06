@@ -1,5 +1,7 @@
 package hw04lrucache
 
+import "sync"
+
 type Key string
 
 type Cache interface {
@@ -15,9 +17,13 @@ type lruCache struct {
 	keys     map[*ListItem]Key
 	// Я не хочу хранить в ListItem.Value ключ и значение, поэтому сделал этот словарь чтобы можно было получить
 	// ключ по *ListItem
+	mu sync.Mutex // Мьютекс для синхронизации
 }
 
 func (c *lruCache) Set(key Key, value any) bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	// если элемент уже есть - перемещаем в начало
 	listItem, exists := c.items[key]
 	if exists {
@@ -45,6 +51,9 @@ func (c *lruCache) Set(key Key, value any) bool {
 }
 
 func (c *lruCache) Get(key Key) (interface{}, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	listItem, exists := c.items[key]
 	if exists {
 		c.queue.MoveToFront(listItem)
@@ -54,6 +63,9 @@ func (c *lruCache) Get(key Key) (interface{}, bool) {
 }
 
 func (c *lruCache) Clear() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	c.items = make(map[Key]*ListItem, c.capacity)
 	c.keys = make(map[*ListItem]Key, c.capacity)
 	c.queue = NewList()
