@@ -31,7 +31,6 @@ func doStage(in In, done In, stage Stage) Out {
 		for value := range in {
 			select {
 			case <-done:
-				<-in
 				return
 			default:
 				// обрабатываем данные с помощью stage (передаем канал, содержащий только value и учитывающий done)
@@ -40,14 +39,16 @@ func doStage(in In, done In, stage Stage) Out {
 				select {
 				case <-done:
 					return
-				case newValue, ok := <-stageOut:
+				default:
+					newValue, ok := <-stageOut
 					if !ok {
 						return
 					}
 					select {
 					case <-done:
 						return
-					case out <- newValue:
+					default:
+						out <- newValue
 					}
 				}
 			}
@@ -65,7 +66,8 @@ func wrapValueToChan(value any, done In) Out {
 		select {
 		case <-done:
 			return
-		case out <- value:
+		default:
+			out <- value
 		}
 	}()
 
