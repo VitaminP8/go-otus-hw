@@ -34,22 +34,13 @@ func doStage(in In, done In, stage Stage) Out {
 				return
 			default:
 				// обрабатываем данные с помощью stage (передаем канал, содержащий только value и учитывающий done)
-				stageOut := stage(wrapValueToChan(value, done))
+				stageOut := stage(wrapValueToChan(value))
 
 				select {
 				case <-done:
 					return
 				default:
-					newValue, ok := <-stageOut
-					if !ok {
-						return
-					}
-					select {
-					case <-done:
-						return
-					default:
-						out <- newValue
-					}
+					out <- <-stageOut
 				}
 			}
 		}
@@ -57,18 +48,13 @@ func doStage(in In, done In, stage Stage) Out {
 	return out
 }
 
-func wrapValueToChan(value any, done In) Out {
+func wrapValueToChan(value any) Out {
 	out := make(Bi)
 
 	go func() {
 		defer close(out)
 
-		select {
-		case <-done:
-			return
-		default:
-			out <- value
-		}
+		out <- value
 	}()
 
 	return out
