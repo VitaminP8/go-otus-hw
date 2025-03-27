@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"log"
 )
 
 var (
@@ -18,5 +20,16 @@ func init() {
 
 func main() {
 	flag.Parse()
-	// Place your code here.
+
+	if from == "" || to == "" {
+		log.Fatal("-from и -to не должны быть пустыми")
+		return
+	}
+
+	err := Copy(from, to, offset, limit)
+	if err != nil {
+		log.Fatalf("Ошибка копирования: %v", err)
+	}
+
+	fmt.Println("Копирование завершено успешно")
 }
