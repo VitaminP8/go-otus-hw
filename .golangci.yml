@@ -17,6 +17,7 @@ linters-settings:
         allow:
           - $gostd
           - github.com/cheggaaa/pb/v3
+          - github.com/VitaminP8/go-otus-hw/hw08_envdir_tool/logger
       Test:
         files:
           - $test
